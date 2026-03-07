@@ -8,18 +8,21 @@
 #   - build_bigrams(http:, tmp_dir:) → array of [word1, word2, freq] triples
 #   - freq_separator                  → separator for freq.txt (tab or space)
 #
+# Output goes to output/ with release-ready filenames:
+#   output/fr-freq.txt, output/fr-bigram.txt, output/en-freq.txt, ...
+#   output/manifest.json (checksums + metadata for update detection)
+#
 # Environment:
 #   DICT_CACHE_DIR — persistent directory for downloaded sources (optional).
-#                    When set, downloaded files are kept across runs to avoid
-#                    re-downloading unchanged sources. When unset, a temporary
-#                    directory is used and cleaned up automatically.
 #
 # Usage:
 #   bundle exec ruby build_dicts.rb
 
+require "digest"
 require "faraday"
 require "faraday/follow_redirects"
 require "fileutils"
+require "json"
 require "tmpdir"
 
 # --- Shared infrastructure ---
@@ -57,6 +60,7 @@ end
 
 REPO_ROOT = File.dirname(File.realpath(__FILE__))
 LANGS_DIR = File.join(REPO_ROOT, "langs")
+OUTPUT_DIR = File.join(REPO_ROOT, "output")
 
 Dir.glob(File.join(LANGS_DIR, "*.rb")).sort.each { |f| require f }
 
@@ -72,26 +76,53 @@ end
 def build_lang(code, lang_mod, tmp_dir:)
   lang_tmp = File.join(tmp_dir, code)
   FileUtils.mkdir_p(lang_tmp)
-  out_dir = File.join(REPO_ROOT, code)
-  FileUtils.mkdir_p(out_dir)
 
   sep = lang_mod.freq_separator
+  files = {}
 
+  # Freq
   words = lang_mod.build_freq(http: DictBuilder::HTTP, tmp_dir: lang_tmp)
-  freq_path = File.join(out_dir, "freq.txt")
+  freq_path = File.join(OUTPUT_DIR, "#{code}-freq.txt")
   File.open(freq_path, "w:utf-8") do |f|
     words.each { |word, freq| f.puts "#{word}#{sep}#{freq}" }
   end
-  puts "  -> #{code}/freq.txt: #{words.size} entries (#{(File.size(freq_path) / 1024.0).round(1)} KB)"
+  files["freq.txt"] = { path: freq_path, entries: words.size }
+  puts "  -> #{code}-freq.txt: #{words.size} entries (#{(File.size(freq_path) / 1024.0).round(1)} KB)"
 
+  # Bigrams
   bigrams = lang_mod.build_bigrams(http: DictBuilder::HTTP, tmp_dir: lang_tmp)
-  bigram_path = File.join(out_dir, "bigram.txt")
+  bigram_path = File.join(OUTPUT_DIR, "#{code}-bigram.txt")
   File.open(bigram_path, "w:utf-8") do |f|
     bigrams.each { |w1, w2, freq| f.puts "#{w1} #{w2} #{freq}" }
   end
-  puts "  -> #{code}/bigram.txt: #{bigrams.size} entries (#{(File.size(bigram_path) / 1024.0).round(1)} KB)"
+  files["bigram.txt"] = { path: bigram_path, entries: bigrams.size }
+  puts "  -> #{code}-bigram.txt: #{bigrams.size} entries (#{(File.size(bigram_path) / 1024.0).round(1)} KB)"
 
-  { words: words.size, bigrams: bigrams.size }
+  files
+end
+
+def build_manifest(all_files)
+  manifest = { generated_at: Time.now.utc.iso8601, languages: {} }
+
+  all_files.each do |code, files|
+    lang_data = {}
+    files.each do |name, info|
+      size = File.size(info[:path])
+      sha256 = Digest::SHA256.file(info[:path]).hexdigest
+      lang_data[name] = {
+        filename: File.basename(info[:path]),
+        size: size,
+        sha256: sha256,
+        entries: info[:entries],
+      }
+    end
+    manifest[:languages][code] = lang_data
+  end
+
+  manifest_path = File.join(OUTPUT_DIR, "manifest.json")
+  File.write(manifest_path, JSON.pretty_generate(manifest))
+  puts "  -> manifest.json"
+  manifest_path
 end
 
 def run(tmp_dir)
@@ -99,25 +130,40 @@ def run(tmp_dir)
   puts "Languages: #{langs.map(&:first).join(", ")}"
   puts
 
-  results = {}
+  FileUtils.rm_rf(OUTPUT_DIR)
+  FileUtils.mkdir_p(OUTPUT_DIR)
+
+  all_files = {}
   langs.each do |code, lang_mod|
-    results[code] = build_lang(code, lang_mod, tmp_dir: tmp_dir)
+    all_files[code] = build_lang(code, lang_mod, tmp_dir: tmp_dir)
     puts
   end
 
+  build_manifest(all_files)
+
+  puts
   puts "Summary:"
-  results.each do |code, r|
-    puts "  #{code.upcase}: #{r[:words]} words, #{r[:bigrams]} bigrams"
+  all_files.each do |code, files|
+    words = files["freq.txt"][:entries]
+    bigrams = files["bigram.txt"][:entries]
+    puts "  #{code.upcase}: #{words} words, #{bigrams} bigrams"
+  end
+  puts
+  puts "Output: #{OUTPUT_DIR}/"
+  Dir.glob(File.join(OUTPUT_DIR, "*")).sort.each do |f|
+    puts "  #{File.basename(f)}: #{(File.size(f) / 1024.0).round(1)} KB"
   end
 end
 
 # --- Main ---
 
-cache_dir = ENV["DICT_CACHE_DIR"]
+if __FILE__ == $PROGRAM_NAME
+  cache_dir = ENV["DICT_CACHE_DIR"]
 
-if cache_dir
-  FileUtils.mkdir_p(cache_dir)
-  run(cache_dir)
-else
-  Dir.mktmpdir("jonawhisper-spellcheck") { |tmp_dir| run(tmp_dir) }
+  if cache_dir
+    FileUtils.mkdir_p(cache_dir)
+    run(cache_dir)
+  else
+    Dir.mktmpdir("jonawhisper-spellcheck") { |tmp_dir| run(tmp_dir) }
+  end
 end

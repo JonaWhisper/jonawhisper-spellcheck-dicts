@@ -2,57 +2,49 @@
 
 SymSpell frequency dictionaries for [JonaWhisper](https://github.com/jplot/jona-whisper) spell-checking.
 
-## Structure
+Published as **GitHub Release assets** — the repo contains only the build tooling.
+
+## Download
+
+Latest dictionaries are always available at:
 
 ```
-fr/
-  freq.txt        # 645K French words (Lexique383 + DELA)
-  bigram.txt      # 5K French bigrams (Google Books Ngram)
-en/
-  freq.txt        # 82K English words (SymSpell official)
-  bigram.txt      # 242K English bigrams (SymSpell official)
-langs/
-  fr.rb           # French sources and build logic
-  en.rb           # English sources and build logic
-build_dicts.rb    # Orchestrator — auto-discovers langs/*.rb
-Gemfile           # Ruby dependencies (Faraday, rubyzip, csv)
+https://github.com/JonaWhisper/jonawhisper-spellcheck-dicts/releases/latest/download/fr-freq.txt
+https://github.com/JonaWhisper/jonawhisper-spellcheck-dicts/releases/latest/download/fr-bigram.txt
+https://github.com/JonaWhisper/jonawhisper-spellcheck-dicts/releases/latest/download/en-freq.txt
+https://github.com/JonaWhisper/jonawhisper-spellcheck-dicts/releases/latest/download/en-bigram.txt
+https://github.com/JonaWhisper/jonawhisper-spellcheck-dicts/releases/latest/download/manifest.json
 ```
 
-## Format
+## File format
 
-- `freq.txt`: one word per line, `word<separator>frequency`
+- `<lang>-freq.txt`: one word per line, `word<separator>frequency`
   - FR: tab-separated
   - EN: space-separated
-- `bigram.txt`: `word1 word2 frequency` (space-separated)
+- `<lang>-bigram.txt`: `word1 word2 frequency` (space-separated)
+- `manifest.json`: checksums, sizes, and entry counts per file
 
-## Building
+## Building locally
 
 ```bash
 bundle install
 bundle exec ruby build_dicts.rb
-```
-
-Set `DICT_CACHE_DIR` to persist downloaded sources between runs:
-
-```bash
-DICT_CACHE_DIR=/tmp/dict-cache bundle exec ruby build_dicts.rb
+# Output in output/
 ```
 
 ## Adding a language
 
 1. Create `langs/<code>.rb` implementing `build_freq`, `build_bigrams`, `freq_separator`
-2. Create the `<code>/` output directory (auto-created on build)
-3. Run `bundle exec ruby build_dicts.rb`
-4. Add the model entry in `jona-engine-spellcheck` (Rust crate)
+2. Run `bundle exec ruby build_dicts.rb`
+3. Add the model entry in `jona-engine-spellcheck` (Rust crate in the main repo)
 
 ## CI
 
-A GitHub Actions workflow runs monthly (first Monday) and on manual dispatch.
-It rebuilds all dictionaries and commits if anything changed.
+A GitHub Actions workflow runs monthly and on manual dispatch.
+It rebuilds all dictionaries, compares with the latest release, and publishes a new versioned release if anything changed.
 
-## License
+## Sources
 
-Dictionary data sourced from:
 - **Lexique383** (Boris New & Christophe Pallier) \u2014 CC BY-SA 4.0
 - **DELA** (LADL, Paris 7) \u2014 public domain linguistic resource
 - **Google Books Ngram Corpus v3** \u2014 CC BY 3.0

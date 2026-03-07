@@ -6,6 +6,9 @@ on:
     # First Monday of each month at 06:00 UTC
     - cron: '0 6 1-7 * 1'
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -20,17 +23,52 @@ jobs:
       - name: Build dictionaries
         run: bundle exec ruby build_dicts.rb
 
-      - name: Check for changes
-        id: diff
+      - name: Check if release needed
+        id: check
         run: |
-          git diff --stat
-          echo "changed=$(git diff --quiet && echo false || echo true)" >> "$GITHUB_OUTPUT"
+          # Download current manifest from latest release (if any)
+          if gh release download latest -p manifest.json -D /tmp/current 2>/dev/null; then
+            old_sha=$(cat /tmp/current/manifest.json | sha256sum | cut -d' ' -f1)
+            new_sha=$(cat output/manifest.json | sha256sum | cut -d' ' -f1)
+            if [ "$old_sha" = "$new_sha" ]; then
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+              echo "No changes detected."
+            else
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              echo "Changes detected, will create new release."
+            fi
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "No existing release found, will create initial release."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit and push
-        if: steps.diff.outputs.changed == 'true'
+      - name: Determine version
+        if: steps.check.outputs.changed == 'true'
+        id: version
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add fr/ en/
-          git commit -m "chore: update dictionaries $(date +%Y-%m-%d)"
-          git push
+          # Get latest tag, bump patch
+          latest=$(gh release list --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null || echo "")
+          if [ -z "$latest" ] || [ "$latest" = "null" ]; then
+            echo "tag=v1.0.0" >> "$GITHUB_OUTPUT"
+          else
+            # Strip 'v' prefix, split, bump patch
+            ver="${latest#v}"
+            IFS='.' read -r major minor patch <<< "$ver"
+            patch=$((patch + 1))
+            echo "tag=v${major}.${minor}.${patch}" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          tag=${{ steps.version.outputs.tag }}
+          gh release create "$tag" \
+            --title "Dictionaries $tag" \
+            --notes "Automated dictionary update — $(date +%Y-%m-%d)" \
+            output/*
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
