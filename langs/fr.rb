@@ -2,6 +2,7 @@
 
 require "csv"
 require "json"
+require "zlib"
 require "zip"
 
 module Langs
@@ -11,9 +12,18 @@ module Langs
       lexique: "http://www.lexique.org/databases/Lexique383/Lexique383.tsv",
       # DELA — resolved dynamically from PyPI JSON API
       dela_pypi: "https://pypi.org/pypi/dict-fr-DELA/json",
-      # Google Books Ngram Corpus v3 — curated French 2-grams
-      bigrams: "https://raw.githubusercontent.com/orgtre/google-books-ngram-frequency/main/ngrams/2grams_french.csv",
+      # Leipzig Corpora — French sentence corpora for bigram extraction
+      # Each tar.gz contains a sentences.txt with 1M sentences
+      bigram_corpora: [
+        "https://downloads.wortschatz-leipzig.de/corpora/fra_newscrawl_2020_1M.tar.gz",
+        "https://downloads.wortschatz-leipzig.de/corpora/fra_wikipedia_2021_1M.tar.gz",
+        "https://downloads.wortschatz-leipzig.de/corpora/fra_news_2020_1M.tar.gz",
+      ].freeze,
     }.freeze
+
+    BIGRAM_LIMIT = 100_000
+    # Match purely alphabetic words (including accented Latin characters)
+    ALPHA_WORD_RE = /\A[a-zA-Z\u00C0-\u024F]+\z/
 
     module_function
 
@@ -62,19 +72,73 @@ module Langs
     end
 
     def build_bigrams(http:, tmp_dir:)
-      puts "Building FR bigrams..."
-      src = DictBuilder.download(SOURCES[:bigrams], File.join(tmp_dir, "fr_bigrams.csv"), http: http)
+      puts "Building FR bigrams from Leipzig Corpora (target: #{BIGRAM_LIMIT})..."
 
-      bigrams = []
-      CSV.foreach(src, headers: true) do |row|
-        ngram = (row["ngram"] || "").strip
-        freq = Integer(row["freq"] || "0", exception: false) || 0
-        parts = ngram.split
-        next unless parts.size == 2
-        bigrams << [parts[0], parts[1], freq]
+      bigrams = {}
+
+      SOURCES[:bigram_corpora].each do |url|
+        filename = File.basename(url)
+        corpus_name = filename.sub(/\.tar\.gz$/, "")
+        dest = File.join(tmp_dir, filename)
+
+        begin
+          DictBuilder.download(url, dest, http: http)
+        rescue => e
+          warn "  WARNING: failed to download #{filename}: #{e.message}"
+          next
+        end
+
+        count = extract_bigrams_from_tar(dest, corpus_name, bigrams)
+        puts "  #{corpus_name}: +#{count} bigram occurrences (unique so far: #{bigrams.size})"
       end
 
-      bigrams
+      puts "  Total unique bigrams: #{bigrams.size}"
+
+      # Sort by frequency descending, take top N
+      result = bigrams.sort_by { |_, freq| -freq }.first(BIGRAM_LIMIT)
+      puts "  Kept top #{result.size} bigrams"
+
+      result.map { |(w1, w2), freq| [w1, w2, freq] }
+    end
+
+    # Extract adjacent-word bigrams from sentences in a Leipzig tar.gz corpus.
+    # Leipzig sentence format: "id\tsentence text\n"
+    def extract_bigrams_from_tar(tar_path, corpus_name, bigrams)
+      require "rubygems/package"
+
+      count = 0
+      sentences_entry = "#{corpus_name}/#{corpus_name}-sentences.txt"
+
+      File.open(tar_path, "rb") do |file|
+        Zlib::GzipReader.wrap(file) do |gz|
+          Gem::Package::TarReader.new(gz) do |tar|
+            tar.each do |entry|
+              next unless entry.full_name == sentences_entry
+
+              entry.read.force_encoding("utf-8").each_line do |line|
+                parts = line.strip.split("\t", 2)
+                next unless parts.size == 2
+
+                words = parts[1].split
+                words.each_cons(2) do |w1, w2|
+                  w1 = w1.downcase
+                  w2 = w2.downcase
+                  next unless ALPHA_WORD_RE.match?(w1) && ALPHA_WORD_RE.match?(w2)
+                  next if w1.length <= 1 && w2.length <= 1  # skip single-char pairs
+
+                  key = [w1, w2].freeze
+                  bigrams[key] = (bigrams[key] || 0) + 1
+                  count += 1
+                end
+              end
+
+              break  # found sentences.txt, no need to continue
+            end
+          end
+        end
+      end
+
+      count
     end
 
     def freq_separator
