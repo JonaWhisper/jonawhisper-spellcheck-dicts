@@ -126,15 +126,20 @@ def build_lang(code, lang_mod, tmp_dir:)
   files
 end
 
-def build_manifest(all_files)
+def build_manifest(all_files, lang_modules)
   manifest = { generated_at: Time.now.utc.iso8601, languages: {} }
 
   all_files.each do |code, files|
-    lang_data = {}
+    lang_mod = lang_modules[code]
+    lang_data = {
+      label: lang_mod&.respond_to?(:label) ? lang_mod.label : code,
+      ram: lang_mod&.respond_to?(:ram) ? lang_mod.ram : 0,
+      files: {},
+    }
     files.each do |name, info|
       size = File.size(info[:path])
       sha256 = Digest::SHA256.file(info[:path]).hexdigest
-      lang_data[name] = {
+      lang_data[:files][name] = {
         filename: File.basename(info[:path]),
         size: size,
         sha256: sha256,
@@ -159,12 +164,14 @@ def run(tmp_dir)
   FileUtils.mkdir_p(OUTPUT_DIR)
 
   all_files = {}
+  lang_modules = {}
   langs.each do |code, lang_mod|
     all_files[code] = build_lang(code, lang_mod, tmp_dir: tmp_dir)
+    lang_modules[code] = lang_mod
     puts
   end
 
-  build_manifest(all_files)
+  build_manifest(all_files, lang_modules)
 
   puts
   puts "Summary:"

@@ -9,6 +9,9 @@ module Langs
 
     module_function
 
+    def label = "English"
+    def ram = 30_000_000
+
     def base_words(http:, tmp_dir:)
       puts "Building EN frequency dictionary..."
       src = DictBuilder.download(SOURCES[:freq], File.join(tmp_dir, "en_freq.txt"), http: http)

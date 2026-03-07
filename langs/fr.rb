@@ -17,6 +17,9 @@ module Langs
 
     module_function
 
+    def label = "Fran\u00e7ais"
+    def ram = 100_000_000
+
     def base_words(http:, tmp_dir:)
       puts "Building FR frequency dictionary..."
       src = DictBuilder.download(SOURCES[:lexique], File.join(tmp_dir, "Lexique383.tsv"), http: http)
