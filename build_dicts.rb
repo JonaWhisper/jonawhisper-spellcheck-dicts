@@ -17,14 +17,19 @@
 #   ruby build_dicts.rb --fresh  # force re-download everything
 
 require "csv"
+require "faraday"
+require "faraday/follow_redirects"
 require "fileutils"
 require "json"
-require "net/http"
-require "open-uri"
-require "uri"
 require "zip"
 
 REPO_ROOT = File.dirname(File.realpath(__FILE__))
+
+HTTP = Faraday.new do |f|
+  f.response :follow_redirects, limit: 5
+  f.options.timeout = 120
+  f.options.open_timeout = 15
+end
 
 # --- Sources ---
 
@@ -51,7 +56,9 @@ def download(url, dest, fresh: false)
     return dest
   end
   puts "  downloading: #{url}"
-  File.open(dest, "wb") { |f| f.write(URI.open(url).read) }
+  response = HTTP.get(url)
+  raise "HTTP #{response.status} for #{url}" unless response.success?
+  File.open(dest, "wb") { |f| f.write(response.body) }
   dest
 end
 
@@ -61,7 +68,9 @@ def ensure_dela
     return
   end
   puts "  Fetching DELA wheel URL from PyPI..."
-  meta = JSON.parse(URI.open(DELA_PYPI_JSON).read)
+  response = HTTP.get(DELA_PYPI_JSON)
+  raise "PyPI API error: HTTP #{response.status}" unless response.success?
+  meta = JSON.parse(response.body)
   whl_url = meta["urls"]&.find { |u| u["filename"].end_with?(".whl") }&.dig("url")
   unless whl_url
     puts "  WARNING: no .whl found on PyPI, skipping DELA"
