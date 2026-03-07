@@ -1,113 +1,128 @@
-# Swiss French regional words
-# Format: word<TAB>frequency<TAB>definition
-# Sources: Usito (Université de Sherbrooke), BDLP, Dictionnaire suisse romand (Thibault/Knecht, Zoé, 2004)
+word	frequency	definition
 #
-# Frequency scale: 50000 = very common, 10000 = common, 5000 = regular, 3000 = known
-# Words already in base FR dict get their frequency boosted to this value if higher.
+# Helvétismes — Mots spécifiques au français de Suisse romande
+#
+# Sources:
+#   - Usito, dictionnaire en ligne (Université de Sherbrooke) — index des helvétismes
+#   - Base de données lexicographiques panfrancophone (BDLP)
+#   - Dictionnaire suisse romand (André Thibault & Pierre Knecht, Éditions Zoé, 2004)
+#
+# Échelle de fréquence:
+#   50000 = très courant (usage quotidien généralisé)
+#   10000 = courant (connu de tous les locuteurs)
+#    5000 = régulier (usage fréquent dans certains contextes)
+#    3000 = connu (compris par la plupart des locuteurs)
+#
+# Les mots déjà présents dans le dictionnaire FR de base voient leur
+# fréquence boostée à cette valeur si elle est supérieure.
 
-# Nombres
+# --- Nombres ---
+# « huitante » est utilisé dans les cantons de Vaud, Valais et Fribourg
+# Les cantons de Genève et Neuchâtel utilisent « quatre-vingts »
 septante	50000	soixante-dix
 huitante	50000	quatre-vingts (Vaud, Valais, Fribourg)
 nonante	50000	quatre-vingt-dix
 
-# Repas
-déjeuner	40000	petit-déjeuner
+# --- Repas (décalage systématique, comme en Belgique) ---
+déjeuner	40000	premier repas de la journée (petit-déjeuner)
 dîner	40000	repas de midi
 souper	30000	repas du soir
-dix-heures	5000	collation du matin
-quatre-heures	5000	goûter
+dix-heures	5000	collation prise vers dix heures du matin
+quatre-heures	5000	goûter de l'après-midi
 
-# Technologie / quotidien
-natel	20000	téléphone portable
+# --- Technologie / quotidien ---
+natel	20000	téléphone portable (de National Telefon)
 natels	8000	téléphones portables
-bancomat	8000	distributeur de billets
-automate	10000	distributeur automatique
+bancomat	8000	distributeur automatique de billets
+automate	10000	distributeur automatique de denrées
 
-# Alimentation
-bircher	10000	müesli
-rösti	12000	galette de pommes de terre
-fondue	20000	fondue au fromage
-raclette	15000	fromage fondu raclé
-cervelas	8000	saucisse nationale
-bricelet	3000	gaufrette croustillante
-damassine	3000	prune ou eau-de-vie
-herbettes	5000	fines herbes
-bénichon	5000	fête automnale fribourgeoise
-bouteille	15000	aussi: biberon
+# --- Alimentation ---
+bircher	10000	müesli (du Dr Bircher-Benner)
+rösti	12000	galette de pommes de terre râpées et rissolées
+fondue	20000	fondue au fromage (plat national)
+raclette	15000	fromage fondu raclé servi avec pommes de terre
+cervelas	8000	saucisse nationale suisse
+bricelet	3000	gaufrette fine et croustillante (spécialité vaudoise)
+damassine	3000	petite prune ou eau-de-vie de cette prune (Jura)
+herbettes	5000	fines herbes aromatiques pour la cuisine
+bénichon	5000	fête automnale traditionnelle fribourgeoise
+bouteille	15000	biberon (en plus du sens standard)
 
-# Ménage / maison
-panosse	8000	serpillère
+# --- Ménage / maison ---
+panosse	8000	serpillère, toile pour laver le sol
 panosser	3000	passer la serpillère
-lavette	5000	carré de tissu
-fourre	5000	housse, étui
-fourres	3000	housses
-cornet	8000	sac plastique
-cornets	5000	sacs plastiques
-galetas	5000	grenier
-cheni	5000	désordre, poussière
-tablar	3000	étagère
-fourneau	8000	cuisinière
-potager	5000	cuisinière (synonyme)
-duvet	8000	couette
+lavette	5000	carré de tissu pour nettoyer les surfaces
+fourre	5000	housse, étui, enveloppe de protection
+fourres	3000	housses, étuis
+cornet	8000	sac en plastique (pour les courses)
+cornets	5000	sacs en plastique
+galetas	5000	grenier, combles, local sous le toit
+cheni	5000	désordre, poussière, bazar
+tablar	3000	étagère, tablette de rangement
+fourneau	8000	cuisinière (appareil de cuisson)
+potager	5000	cuisinière (synonyme de fourneau)
+duvet	8000	couette, édredon
 
-# Transport
-pendulaire	8000	navetteur
+# --- Transport ---
+pendulaire	8000	personne faisant la navette quotidienne
 pendulaires	5000	navetteurs
-giratoire	8000	rond-point
-berme	3000	terre-plein d'autoroute
+giratoire	8000	rond-point, carrefour à sens giratoire
+berme	3000	terre-plein central d'une autoroute
 
-# Administration / politique
-votation	15000	vote populaire
-votations	10000	votes populaires
-initiative	20000	initiative populaire
-canton	25000	division administrative
-cantons	15000	divisions administratives
+# --- Administration / politique ---
+# La démocratie directe suisse a un vocabulaire spécifique
+votation	15000	scrutin populaire (référendum ou initiative)
+votations	10000	scrutins populaires
+initiative	20000	initiative populaire (droit de proposer une loi)
+canton	25000	État fédéré membre de la Confédération suisse
+cantons	15000	États fédérés suisses
 cantonal	10000	relatif au canton
 cantonaux	8000	relatifs aux cantons
 cantonale	8000	relative au canton
-cantonales	5000	relatives aux cantons
-cantonaliser	3000	transférer au niveau cantonal
-intercantonal	5000	entre cantons
+cantonales	5000	relatives aux cantons (ou élections cantonales)
+cantonaliser	3000	transférer une compétence au niveau cantonal
+intercantonal	5000	concernant plusieurs cantons
 communal	10000	relatif à la commune
 communaux	5000	relatifs à la commune
 communale	8000	relative à la commune
-syndic	8000	maire (Vaud)
-municipal	10000	relatif à la municipalité
+syndic	8000	maire (titre officiel dans le canton de Vaud)
+municipal	10000	relatif à la municipalité (exécutif communal)
 municipale	8000	relative à la municipalité
-district	10000	subdivision cantonale
-préfet	8000	chef de district
-assermentation	3000	prestation de serment
+district	10000	subdivision administrative d'un canton
+préfet	8000	chef administratif d'un district
+assermentation	3000	cérémonie de prestation de serment
 
-# Éducation
-maturité	12000	baccalauréat
-gymnase	10000	lycée
-gymnasien	5000	lycéen
-gymnasienne	5000	lycéenne
+# --- Éducation ---
+# Le système scolaire suisse a sa terminologie propre
+maturité	12000	diplôme de fin d'études secondaires (baccalauréat)
+gymnase	10000	établissement d'enseignement secondaire supérieur (lycée)
+gymnasien	5000	élève du gymnase (lycéen)
+gymnasienne	5000	élève du gymnase (lycéenne)
 gymnasial	3000	relatif au gymnase
-apprenti	10000	en formation professionnelle
-apprentie	8000	en formation professionnelle
-apprentissage	15000	formation professionnelle
-logopédiste	3000	orthophoniste
-doubler	5000	redoubler une année
+apprenti	10000	personne en formation professionnelle duale
+apprentie	8000	personne en formation professionnelle duale
+apprentissage	15000	formation professionnelle (système dual école-entreprise)
+logopédiste	3000	spécialiste des troubles du langage (orthophoniste)
+doubler	5000	redoubler une année scolaire
 
-# Nature / géographie
-armailli	3000	vacher d'alpage
-inalpe	3000	montée des troupeaux en alpage
-désalpe	5000	descente des troupeaux
-bisse	5000	canal d'irrigation (Valais)
-gouille	3000	flaque d'eau
-châble	3000	pente boisée
-foyard	3000	hêtre
-mayens	3000	pâturages de mi-saison
+# --- Nature / géographie alpine ---
+armailli	3000	vacher travaillant en alpage (terme fribourgeois)
+inalpe	3000	montée des troupeaux aux pâturages d'altitude
+désalpe	5000	descente des troupeaux des alpages en automne
+bisse	5000	canal d'irrigation à ciel ouvert (Valais)
+gouille	3000	flaque d'eau, petit plan d'eau naturel
+châble	3000	passage en pente pour dévaler le bois
+foyard	3000	hêtre (arbre)
+mayens	3000	pâturages et chalets de mi-saison (entre village et alpage)
 
-# Expressions / divers
-action	20000	promotion commerciale
-direct	15000	directement
-cru	8000	humide et froid (temps)
-boquer	3000	bouder
-encoubler	3000	embarrasser, trébucher
-peser	8000	appuyer (sur un bouton)
-imperdable	3000	épingle de sûreté
-carrousel	5000	manège
-fion	3000	raillerie
-gonfle	3000	congère, embarras
+# --- Expressions / divers ---
+action	20000	promotion commerciale, soldes (en action = en promo)
+direct	15000	directement, sans détour (j'y vais direct)
+cru	8000	humide et froid (temps cru)
+boquer	3000	bouder, refuser obstinément
+encoubler	3000	embarrasser, faire trébucher
+peser	8000	appuyer sur un bouton (pesez sur le bouton)
+imperdable	3000	épingle de sûreté, épingle de nourrice
+carrousel	5000	manège de chevaux de bois
+fion	3000	raillerie, moquerie
+gonfle	3000	congère de neige, embarras

@@ -39,7 +39,7 @@ module DictBuilder
   module_function
 
   # Merge regional words from data/<code>.tsv into a base word hash.
-  # TSV format: word<TAB>frequency<TAB>definition (comments start with #).
+  # TSV with headers: word, frequency, definition. Comments (#) are skipped.
   # Returns the number of words added/boosted.
   def merge_regional!(words, code)
     path = File.join(DATA_DIR, "#{code}.tsv")
@@ -49,13 +49,9 @@ module DictBuilder
     end
 
     count = 0
-    File.foreach(path, encoding: "utf-8") do |line|
-      line = line.strip
-      next if line.empty? || line.start_with?("#")
-      parts = line.split("\t")
-      next if parts.size < 2
-      word = parts[0].strip.downcase
-      freq = Integer(parts[1].strip, exception: false) || 0
+    CSV.foreach(path, col_sep: "\t", headers: true, skip_lines: /\A\s*#/) do |row|
+      word = (row["word"] || "").strip.downcase
+      freq = Integer(row["frequency"] || "0", exception: false) || 0
       next if word.empty? || freq <= 0
       words[word] = [words.fetch(word, 0), freq].max
       count += 1
