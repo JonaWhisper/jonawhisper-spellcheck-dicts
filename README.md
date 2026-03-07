@@ -45,7 +45,7 @@ It rebuilds all dictionaries, compares with the latest release, and publishes a 
 
 ## Sources
 
-- **Lexique383** (Boris New & Christophe Pallier) \u2014 CC BY-SA 4.0
-- **DELA** (LADL, Paris 7) \u2014 public domain linguistic resource
-- **Google Books Ngram Corpus v3** \u2014 CC BY 3.0
-- **SymSpell EN dictionaries** \u2014 MIT License
+- **Lexique383** (Boris New & Christophe Pallier) — CC BY-SA 4.0
+- **DELA** (LADL, Paris 7) — public domain linguistic resource
+- **Google Books Ngram Corpus v3** — CC BY 3.0
+- **SymSpell EN dictionaries** — MIT License
