@@ -1,0 +1,35 @@
+name: Update dictionaries
+
+on:
+  workflow_dispatch:
+  schedule:
+    # First Monday of each month at 06:00 UTC
+    - cron: '0 6 1-7 * 1'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build dictionaries
+        run: python build_dicts.py --fresh
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --stat
+          echo "changed=$(git diff --quiet && echo false || echo true)" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fr/ en/
+          git commit -m "chore: update dictionaries $(date +%Y-%m-%d)"
+          git push
