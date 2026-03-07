@@ -7,7 +7,6 @@ module Langs
     module_function
 
     def label = "Fran\u00e7ais (Belgique)"
-    def ram = 100_000_000
 
     def build_freq(http:, tmp_dir:)
       fr_tmp = File.join(tmp_dir, "fr_base")

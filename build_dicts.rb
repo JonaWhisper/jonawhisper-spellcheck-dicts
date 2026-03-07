@@ -133,7 +133,6 @@ def build_manifest(all_files, lang_modules)
     lang_mod = lang_modules[code]
     lang_data = {
       label: lang_mod&.respond_to?(:label) ? lang_mod.label : code,
-      ram: lang_mod&.respond_to?(:ram) ? lang_mod.ram : 0,
       files: {},
     }
     files.each do |name, info|

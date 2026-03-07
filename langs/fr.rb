@@ -18,7 +18,6 @@ module Langs
     module_function
 
     def label = "Fran\u00e7ais"
-    def ram = 100_000_000
 
     def base_words(http:, tmp_dir:)
       puts "Building FR frequency dictionary..."
