@@ -17,17 +17,8 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Cache source downloads
-        uses: actions/cache@v4
-        with:
-          path: /tmp/jonawhisper-spellcheck-sources
-          key: dict-sources-${{ hashFiles('langs/*.rb') }}
-          restore-keys: dict-sources-
-
       - name: Build dictionaries
         run: bundle exec ruby build_dicts.rb
-        env:
-          DICT_CACHE_DIR: /tmp/jonawhisper-spellcheck-sources
 
       - name: Check for changes
         id: diff
