@@ -13,17 +13,19 @@
 #   en/bigram.txt   — 242K English bigrams (space-separated: word1 word2 freq)
 #
 # Usage:
-#   ruby build_dicts.rb          # build all (uses cache)
-#   ruby build_dicts.rb --fresh  # force re-download everything
+#   bundle exec ruby build_dicts.rb          # build all (uses cache)
+#   bundle exec ruby build_dicts.rb --fresh  # force re-download everything
 
 require "csv"
 require "faraday"
 require "faraday/follow_redirects"
 require "fileutils"
 require "json"
+require "tmpdir"
 require "zip"
 
 REPO_ROOT = File.dirname(File.realpath(__FILE__))
+CACHE_DIR = File.join(Dir.tmpdir, "jonawhisper-spellcheck-build")
 
 HTTP = Faraday.new do |f|
   f.response :follow_redirects, limit: 5
@@ -33,22 +35,25 @@ end
 
 # --- Sources ---
 
-LEXIQUE_URL    = "http://www.lexique.org/databases/Lexique383/Lexique383.tsv"
-LEXIQUE_CACHE  = "/tmp/Lexique383.tsv"
+SOURCES = {
+  # Lexique383 — HTTP only, site does not support HTTPS
+  lexique: "http://www.lexique.org/databases/Lexique383/Lexique383.tsv",
+  # DELA — resolved dynamically from PyPI JSON API
+  dela_pypi: "https://pypi.org/pypi/dict-fr-DELA/json",
+  # Google Books Ngram Corpus v3 — curated French 2-grams
+  fr_bigrams: "https://raw.githubusercontent.com/orgtre/google-books-ngram-frequency/main/ngrams/2grams_french.csv",
+  # SymSpell official dictionaries
+  en_freq: "https://raw.githubusercontent.com/wolfgarbe/SymSpell/master/SymSpell/frequency_dictionary_en_82_765.txt",
+  en_bigrams: "https://raw.githubusercontent.com/wolfgarbe/SymSpell/master/SymSpell/frequency_bigramdictionary_en_243_342.txt",
+}.freeze
 
-# DELA French dictionary — 641K inflected forms from LADL (distributed as a PyPI wheel = zip)
-DELA_PYPI_JSON = "https://pypi.org/pypi/dict-fr-DELA/json"
-DELA_WHEEL_CACHE = "/tmp/dict_fr_DELA.whl"
-DELA_DICT = "/tmp/dela_ruby/dict-fr-DELA-common-words.unicode"
-DELA_DICT_PATTERN = "dict-fr-DELA-common-words.unicode"
+LANG_DIRS = %w[fr en].freeze
 
-# French bigrams from Google Books Ngram Corpus v3 (top 5K, 2010-2019 books)
-FR_BIGRAM_URL   = "https://raw.githubusercontent.com/orgtre/google-books-ngram-frequency/main/ngrams/2grams_french.csv"
-FR_BIGRAM_CACHE = "/tmp/fr_bigrams_google.csv"
+# --- Helpers ---
 
-# SymSpell official English frequency dict (82K words) + bigrams (242K)
-EN_FREQ_URL   = "https://raw.githubusercontent.com/wolfgarbe/SymSpell/master/SymSpell/frequency_dictionary_en_82_765.txt"
-EN_BIGRAM_URL = "https://raw.githubusercontent.com/wolfgarbe/SymSpell/master/SymSpell/frequency_bigramdictionary_en_243_342.txt"
+def cache_path(name)
+  File.join(CACHE_DIR, name)
+end
 
 def download(url, dest, fresh: false)
   if File.exist?(dest) && !fresh
@@ -58,68 +63,86 @@ def download(url, dest, fresh: false)
   puts "  downloading: #{url}"
   response = HTTP.get(url)
   raise "HTTP #{response.status} for #{url}" unless response.success?
+  FileUtils.mkdir_p(File.dirname(dest))
   File.open(dest, "wb") { |f| f.write(response.body) }
+  puts "  saved: #{(File.size(dest) / 1024.0).round(1)} KB"
   dest
 end
 
-def ensure_dela
-  if File.exist?(DELA_DICT)
-    puts "  DELA cached: #{DELA_DICT}"
-    return
-  end
-  puts "  Fetching DELA wheel URL from PyPI..."
-  response = HTTP.get(DELA_PYPI_JSON)
-  raise "PyPI API error: HTTP #{response.status}" unless response.success?
-  meta = JSON.parse(response.body)
-  whl_url = meta["urls"]&.find { |u| u["filename"].end_with?(".whl") }&.dig("url")
-  unless whl_url
-    puts "  WARNING: no .whl found on PyPI, skipping DELA"
-    return
-  end
-  download(whl_url, DELA_WHEEL_CACHE)
-  # A .whl is a zip — extract the dict file with rubyzip
-  FileUtils.mkdir_p(File.dirname(DELA_DICT))
-  Zip::File.open(DELA_WHEEL_CACHE) do |zip|
-    entry = zip.entries.find { |e| e.name.end_with?(DELA_DICT_PATTERN) }
-    if entry
-      File.open(DELA_DICT, "wb") { |f| f.write(entry.get_input_stream.read) }
-    end
-  end
-  puts "  WARNING: DELA extraction failed, skipping DELA enrichment" unless File.exist?(DELA_DICT)
+def output_path(lang, filename)
+  dir = File.join(REPO_ROOT, lang)
+  FileUtils.mkdir_p(dir)
+  File.join(dir, filename)
 end
 
-def build_fr_dict(fresh: false)
-  puts "Building FR dictionary from Lexique383 + DELA..."
-  src = download(LEXIQUE_URL, LEXIQUE_CACHE, fresh: fresh)
+def count_lines(path)
+  File.foreach(path).count
+end
+
+# --- DELA ---
+
+def fetch_dela(fresh: false)
+  dict_path = cache_path("dela-common-words.unicode")
+  if File.exist?(dict_path) && !fresh
+    puts "  DELA cached: #{dict_path}"
+    return dict_path
+  end
+
+  puts "  Fetching DELA wheel URL from PyPI..."
+  response = HTTP.get(SOURCES[:dela_pypi])
+  raise "PyPI API error: HTTP #{response.status}" unless response.success?
+
+  meta = JSON.parse(response.body)
+  whl_info = meta["urls"]&.find { |u| u["filename"].end_with?(".whl") }
+  unless whl_info
+    warn "  WARNING: no .whl found on PyPI, skipping DELA"
+    return nil
+  end
+
+  whl_path = cache_path("dict_fr_DELA.whl")
+  download(whl_info["url"], whl_path, fresh: true)
+
+  # A .whl is a zip — find and extract the common-words dict
+  Zip::File.open(whl_path) do |zip|
+    entry = zip.entries.find { |e| e.name.end_with?("dict-fr-DELA-common-words.unicode") }
+    unless entry
+      warn "  WARNING: dict file not found in wheel"
+      return nil
+    end
+    File.open(dict_path, "wb") { |f| f.write(entry.get_input_stream.read) }
+  end
+
+  puts "  DELA extracted: #{(File.size(dict_path) / 1024.0).round(1)} KB"
+  dict_path
+end
+
+# --- Builders ---
+
+def build_fr_freq(fresh: false)
+  puts "Building FR frequency dictionary..."
+  src = download(SOURCES[:lexique], cache_path("Lexique383.tsv"), fresh: fresh)
 
   words = {}
 
-  # Step 1: Load Lexique383 (with frequencies)
   CSV.foreach(src, col_sep: "\t", headers: true, liberal_parsing: true) do |row|
     word = (row["ortho"] || "").strip.downcase
     next if word.empty? || word.length <= 1
 
-    freq_livres = (row["freqlivres"] || "0").to_f
-    freq_films  = (row["freqfilms2"] || "0").to_f
+    freq_livres = Float(row["freqlivres"] || "0", exception: false) || 0.0
+    freq_films = Float(row["freqfilms2"] || "0", exception: false) || 0.0
 
-    # Combine both corpora with books weighted higher (more relevant for dictation)
-    freq = ((freq_livres * 70 + freq_films * 30) * 100).to_i
-    freq = [freq, 1].max
-
+    freq = [((freq_livres * 70 + freq_films * 30) * 100).to_i, 1].max
     words[word] = freq if !words.key?(word) || words[word] < freq
   end
 
-  lexique_count = words.size
-  puts "  Lexique383: #{lexique_count} words"
+  puts "  Lexique383: #{words.size} words"
 
-  # Step 2: Enrich with DELA (641K inflected forms, no frequency data)
-  ensure_dela
-  dela_added = 0
-  if File.exist?(DELA_DICT)
-    File.foreach(DELA_DICT, encoding: "utf-8") do |line|
+  dela_path = fetch_dela(fresh: fresh)
+  if dela_path
+    dela_added = 0
+    File.foreach(dela_path, encoding: "utf-8") do |line|
       word = line.strip.downcase
-      next if word.empty? || word.length <= 1
-      next if word.include?(" ")
+      next if word.empty? || word.length <= 1 || word.include?(" ")
       unless words.key?(word)
         words[word] = 1
         dela_added += 1
@@ -130,39 +153,32 @@ def build_fr_dict(fresh: false)
     puts "  DELA: skipped (not available)"
   end
 
-  # Sort by frequency descending
-  sorted_words = words.sort_by { |_, freq| -freq }
-
-  out_dir = File.join(REPO_ROOT, "fr")
-  FileUtils.mkdir_p(out_dir)
-  out = File.join(out_dir, "freq.txt")
+  out = output_path("fr", "freq.txt")
+  sorted = words.sort_by { |_, freq| -freq }
   File.open(out, "w:utf-8") do |f|
-    sorted_words.each { |word, freq| f.puts "#{word}\t#{freq}" }
+    sorted.each { |word, freq| f.puts "#{word}\t#{freq}" }
   end
 
-  puts "  wrote #{sorted_words.size} words to #{out}"
-  sorted_words.size
+  puts "  wrote #{sorted.size} words to #{out}"
+  sorted.size
 end
 
 def build_fr_bigrams(fresh: false)
-  puts "Building FR bigrams from Google Books Ngram..."
-  src = download(FR_BIGRAM_URL, FR_BIGRAM_CACHE, fresh: fresh)
+  puts "Building FR bigrams..."
+  src = download(SOURCES[:fr_bigrams], cache_path("fr_bigrams_google.csv"), fresh: fresh)
 
-  out_dir = File.join(REPO_ROOT, "fr")
-  FileUtils.mkdir_p(out_dir)
-  out = File.join(out_dir, "bigram.txt")
+  out = output_path("fr", "bigram.txt")
   count = 0
 
   File.open(out, "w:utf-8") do |fout|
     CSV.foreach(src, headers: true) do |row|
       ngram = (row["ngram"] || "").strip
-      freq = row["freq"].to_i
+      freq = Integer(row["freq"] || "0", exception: false) || 0
       parts = ngram.split
-      # Only keep clean 2-word bigrams (skip tokenization artifacts like "d' un")
-      if parts.size == 2
-        fout.puts "#{parts[0]} #{parts[1]} #{freq}"
-        count += 1
-      end
+      next unless parts.size == 2
+
+      fout.puts "#{parts[0]} #{parts[1]} #{freq}"
+      count += 1
     end
   end
 
@@ -170,48 +186,46 @@ def build_fr_bigrams(fresh: false)
   count
 end
 
-def build_en_dict(fresh: false)
-  puts "Building EN dictionary from SymSpell official..."
-  out_dir = File.join(REPO_ROOT, "en")
-  FileUtils.mkdir_p(out_dir)
-  dest = File.join(out_dir, "freq.txt")
-  download(EN_FREQ_URL, dest, fresh: fresh)
-
-  count = File.foreach(dest).count
-  puts "  #{count} words in #{dest}"
+def build_en_freq(fresh: false)
+  puts "Building EN frequency dictionary..."
+  out = output_path("en", "freq.txt")
+  download(SOURCES[:en_freq], out, fresh: fresh)
+  count = count_lines(out)
+  puts "  #{count} words"
   count
 end
 
 def build_en_bigrams(fresh: false)
-  puts "Downloading EN bigram dictionary..."
-  out_dir = File.join(REPO_ROOT, "en")
-  FileUtils.mkdir_p(out_dir)
-  dest = File.join(out_dir, "bigram.txt")
-  download(EN_BIGRAM_URL, dest, fresh: fresh)
-
-  count = File.foreach(dest).count
-  puts "  #{count} bigrams in #{dest}"
+  puts "Building EN bigrams..."
+  out = output_path("en", "bigram.txt")
+  download(SOURCES[:en_bigrams], out, fresh: fresh)
+  count = count_lines(out)
+  puts "  #{count} bigrams"
   count
 end
 
 # --- Main ---
 
 fresh = ARGV.include?("--fresh")
+FileUtils.mkdir_p(CACHE_DIR)
 
-fr_count = build_fr_dict(fresh: fresh)
-fr_bi    = build_fr_bigrams(fresh: fresh)
-en_count = build_en_dict(fresh: fresh)
-en_bi    = build_en_bigrams(fresh: fresh)
+results = {
+  fr_words: build_fr_freq(fresh: fresh),
+  fr_bigrams: build_fr_bigrams(fresh: fresh),
+  en_words: build_en_freq(fresh: fresh),
+  en_bigrams: build_en_bigrams(fresh: fresh),
+}
 
 puts
 puts "Done!"
-puts "  FR: #{fr_count} words, #{fr_bi} bigrams"
-puts "  EN: #{en_count} words, #{en_bi} bigrams"
+puts "  FR: #{results[:fr_words]} words, #{results[:fr_bigrams]} bigrams"
+puts "  EN: #{results[:en_words]} words, #{results[:en_bigrams]} bigrams"
+puts
 
-Dir.glob(File.join(REPO_ROOT, "*/")).sort.each do |lang_dir|
-  next if File.basename(lang_dir).start_with?(".")
-  Dir.glob(File.join(lang_dir, "*.txt")).sort.each do |f|
-    size = File.size(f)
-    puts "  #{File.basename(lang_dir)}/#{File.basename(f)}: #{size / 1024} KB"
+LANG_DIRS.each do |lang|
+  dir = File.join(REPO_ROOT, lang)
+  next unless File.directory?(dir)
+  Dir.glob(File.join(dir, "*.txt")).sort.each do |f|
+    puts "  #{lang}/#{File.basename(f)}: #{(File.size(f) / 1024.0).round(1)} KB"
   end
 end
