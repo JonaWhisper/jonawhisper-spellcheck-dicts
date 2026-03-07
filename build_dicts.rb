@@ -39,10 +39,15 @@ module DictBuilder
       return dest
     end
     puts "  downloading: #{url}"
-    response = http.get(url)
-    raise "HTTP #{response.status} for #{url}" unless response.success?
     FileUtils.mkdir_p(File.dirname(dest))
-    File.open(dest, "wb") { |f| f.write(response.body) }
+    File.open(dest, "wb") do |file|
+      http.get(url) do |req|
+        req.options.on_data = proc do |chunk, _size, env|
+          raise "HTTP #{env.status} for #{url}" if env.status >= 400
+          file.write(chunk)
+        end
+      end
+    end
     puts "  saved: #{(File.size(dest) / 1024.0).round(1)} KB"
     dest
   end
