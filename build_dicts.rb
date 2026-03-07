@@ -18,8 +18,11 @@
 
 require "csv"
 require "fileutils"
+require "json"
 require "net/http"
+require "open-uri"
 require "uri"
+require "zip"
 
 REPO_ROOT = File.dirname(File.realpath(__FILE__))
 
@@ -28,8 +31,11 @@ REPO_ROOT = File.dirname(File.realpath(__FILE__))
 LEXIQUE_URL    = "http://www.lexique.org/databases/Lexique383/Lexique383.tsv"
 LEXIQUE_CACHE  = "/tmp/Lexique383.tsv"
 
-# DELA French dictionary — 641K inflected forms from LADL
+# DELA French dictionary — 641K inflected forms from LADL (distributed as a PyPI wheel = zip)
+DELA_PYPI_JSON = "https://pypi.org/pypi/dict-fr-DELA/json"
+DELA_WHEEL_CACHE = "/tmp/dict_fr_DELA.whl"
 DELA_DICT = "/tmp/dela_ruby/dict-fr-DELA-common-words.unicode"
+DELA_DICT_PATTERN = "dict-fr-DELA-common-words.unicode"
 
 # French bigrams from Google Books Ngram Corpus v3 (top 5K, 2010-2019 books)
 FR_BIGRAM_URL   = "https://raw.githubusercontent.com/orgtre/google-books-ngram-frequency/main/ngrams/2grams_french.csv"
@@ -45,15 +51,7 @@ def download(url, dest, fresh: false)
     return dest
   end
   puts "  downloading: #{url}"
-  uri = URI(url)
-  response = Net::HTTP.get_response(uri)
-  # Follow redirects (up to 5)
-  5.times do
-    break unless response.is_a?(Net::HTTPRedirection)
-    uri = URI(response["location"])
-    response = Net::HTTP.get_response(uri)
-  end
-  File.write(dest, response.body)
+  File.open(dest, "wb") { |f| f.write(URI.open(url).read) }
   dest
 end
 
@@ -62,18 +60,23 @@ def ensure_dela
     puts "  DELA cached: #{DELA_DICT}"
     return
   end
-  puts "  Downloading DELA dictionary from PyPI..."
-  # Download the wheel directly and extract the dict file
-  dela_tmp = "/tmp/dela_ruby"
-  FileUtils.mkdir_p(dela_tmp)
-  # Use pip to download the package
-  system("pip3 install --target #{dela_tmp} dict-fr-DELA > /dev/null 2>&1")
-  # The dict file might be nested — find it
-  dict_file = Dir.glob("#{dela_tmp}/**/dict-fr-DELA-common-words.unicode").first
-  if dict_file && dict_file != DELA_DICT
-    FileUtils.cp(dict_file, DELA_DICT)
+  puts "  Fetching DELA wheel URL from PyPI..."
+  meta = JSON.parse(URI.open(DELA_PYPI_JSON).read)
+  whl_url = meta["urls"]&.find { |u| u["filename"].end_with?(".whl") }&.dig("url")
+  unless whl_url
+    puts "  WARNING: no .whl found on PyPI, skipping DELA"
+    return
   end
-  puts "  WARNING: DELA install failed, skipping DELA enrichment" unless File.exist?(DELA_DICT)
+  download(whl_url, DELA_WHEEL_CACHE)
+  # A .whl is a zip — extract the dict file with rubyzip
+  FileUtils.mkdir_p(File.dirname(DELA_DICT))
+  Zip::File.open(DELA_WHEEL_CACHE) do |zip|
+    entry = zip.entries.find { |e| e.name.end_with?(DELA_DICT_PATTERN) }
+    if entry
+      File.open(DELA_DICT, "wb") { |f| f.write(entry.get_input_stream.read) }
+    end
+  end
+  puts "  WARNING: DELA extraction failed, skipping DELA enrichment" unless File.exist?(DELA_DICT)
 end
 
 def build_fr_dict(fresh: false)

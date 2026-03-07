@@ -15,9 +15,10 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
+          bundler-cache: true
 
       - name: Build dictionaries
-        run: ruby build_dicts.rb --fresh
+        run: bundle exec ruby build_dicts.rb --fresh
 
       - name: Check for changes
         id: diff
