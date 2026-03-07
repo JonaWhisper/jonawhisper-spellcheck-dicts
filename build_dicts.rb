@@ -65,10 +65,12 @@ OUTPUT_DIR = File.join(REPO_ROOT, "output")
 Dir.glob(File.join(LANGS_DIR, "*.rb")).sort.each { |f| require f }
 
 def available_langs
-  Langs.constants
-    .select { |c| Langs.const_get(c).is_a?(Module) }
-    .map { |c| [c.to_s.downcase, Langs.const_get(c)] }
-    .sort_by(&:first)
+  Dir.glob(File.join(LANGS_DIR, "*.rb")).sort.filter_map do |f|
+    code = File.basename(f, ".rb").tr("_", "-")
+    mod_name = code.split("-").map(&:capitalize).join
+    mod = Langs.const_get(mod_name, false) rescue nil
+    [code, mod] if mod&.respond_to?(:build_freq)
+  end
 end
 
 # --- Build pipeline ---

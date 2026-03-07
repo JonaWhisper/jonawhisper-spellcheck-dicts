@@ -17,7 +17,7 @@ module Langs
 
     module_function
 
-    def build_freq(http:, tmp_dir:)
+    def base_words(http:, tmp_dir:)
       puts "Building FR frequency dictionary..."
       src = DictBuilder.download(SOURCES[:lexique], File.join(tmp_dir, "Lexique383.tsv"), http: http)
 
@@ -52,7 +52,11 @@ module Langs
         puts "  DELA: skipped (not available)"
       end
 
-      words.sort_by { |_, freq| -freq }
+      words
+    end
+
+    def build_freq(http:, tmp_dir:)
+      base_words(http: http, tmp_dir: tmp_dir).sort_by { |_, freq| -freq }
     end
 
     def build_bigrams(http:, tmp_dir:)
