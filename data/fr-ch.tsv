@@ -1,54 +1,26 @@
 word	frequency	definition
-#
-# Helvétismes — Mots spécifiques au français de Suisse romande
-#
-# Sources:
-#   - Usito, dictionnaire en ligne (Université de Sherbrooke) — index des helvétismes
-#   - Base de données lexicographiques panfrancophone (BDLP)
-#   - Dictionnaire suisse romand (André Thibault & Pierre Knecht, Éditions Zoé, 2004)
-#
-# Échelle de fréquence:
-#   50000 = très courant (usage quotidien généralisé)
-#   10000 = courant (connu de tous les locuteurs)
-#    5000 = régulier (usage fréquent dans certains contextes)
-#    3000 = connu (compris par la plupart des locuteurs)
-#
-# Les mots déjà présents dans le dictionnaire FR de base voient leur
-# fréquence boostée à cette valeur si elle est supérieure.
-
-# --- Nombres ---
-# « huitante » est utilisé dans les cantons de Vaud, Valais et Fribourg
-# Les cantons de Genève et Neuchâtel utilisent « quatre-vingts »
 septante	50000	soixante-dix
 huitante	50000	quatre-vingts (Vaud, Valais, Fribourg)
 nonante	50000	quatre-vingt-dix
-
-# --- Repas (décalage systématique, comme en Belgique) ---
 déjeuner	40000	premier repas de la journée (petit-déjeuner)
 dîner	40000	repas de midi
 souper	30000	repas du soir
 dix-heures	5000	collation prise vers dix heures du matin
 quatre-heures	5000	goûter de l'après-midi
-
-# --- Technologie / quotidien ---
 natel	20000	téléphone portable (de National Telefon)
 natels	8000	téléphones portables
 bancomat	8000	distributeur automatique de billets
 automate	10000	distributeur automatique de denrées
-
-# --- Alimentation ---
 bircher	10000	müesli (du Dr Bircher-Benner)
 rösti	12000	galette de pommes de terre râpées et rissolées
 fondue	20000	fondue au fromage (plat national)
 raclette	15000	fromage fondu raclé servi avec pommes de terre
 cervelas	8000	saucisse nationale suisse
 bricelet	3000	gaufrette fine et croustillante (spécialité vaudoise)
-damassine	3000	petite prune ou eau-de-vie de cette prune (Jura)
+damassine	3000	petite prune ou eau-de-vie (Jura)
 herbettes	5000	fines herbes aromatiques pour la cuisine
 bénichon	5000	fête automnale traditionnelle fribourgeoise
 bouteille	15000	biberon (en plus du sens standard)
-
-# --- Ménage / maison ---
 panosse	8000	serpillère, toile pour laver le sol
 panosser	3000	passer la serpillère
 lavette	5000	carré de tissu pour nettoyer les surfaces
@@ -62,15 +34,10 @@ tablar	3000	étagère, tablette de rangement
 fourneau	8000	cuisinière (appareil de cuisson)
 potager	5000	cuisinière (synonyme de fourneau)
 duvet	8000	couette, édredon
-
-# --- Transport ---
 pendulaire	8000	personne faisant la navette quotidienne
 pendulaires	5000	navetteurs
 giratoire	8000	rond-point, carrefour à sens giratoire
 berme	3000	terre-plein central d'une autoroute
-
-# --- Administration / politique ---
-# La démocratie directe suisse a un vocabulaire spécifique
 votation	15000	scrutin populaire (référendum ou initiative)
 votations	10000	scrutins populaires
 initiative	20000	initiative populaire (droit de proposer une loi)
@@ -91,9 +58,6 @@ municipale	8000	relative à la municipalité
 district	10000	subdivision administrative d'un canton
 préfet	8000	chef administratif d'un district
 assermentation	3000	cérémonie de prestation de serment
-
-# --- Éducation ---
-# Le système scolaire suisse a sa terminologie propre
 maturité	12000	diplôme de fin d'études secondaires (baccalauréat)
 gymnase	10000	établissement d'enseignement secondaire supérieur (lycée)
 gymnasien	5000	élève du gymnase (lycéen)
@@ -104,8 +68,6 @@ apprentie	8000	personne en formation professionnelle duale
 apprentissage	15000	formation professionnelle (système dual école-entreprise)
 logopédiste	3000	spécialiste des troubles du langage (orthophoniste)
 doubler	5000	redoubler une année scolaire
-
-# --- Nature / géographie alpine ---
 armailli	3000	vacher travaillant en alpage (terme fribourgeois)
 inalpe	3000	montée des troupeaux aux pâturages d'altitude
 désalpe	5000	descente des troupeaux des alpages en automne
@@ -113,16 +75,14 @@ bisse	5000	canal d'irrigation à ciel ouvert (Valais)
 gouille	3000	flaque d'eau, petit plan d'eau naturel
 châble	3000	passage en pente pour dévaler le bois
 foyard	3000	hêtre (arbre)
-mayens	3000	pâturages et chalets de mi-saison (entre village et alpage)
-
-# --- Expressions / divers ---
-action	20000	promotion commerciale, soldes (en action = en promo)
-direct	15000	directement, sans détour (j'y vais direct)
+mayens	3000	pâturages et chalets de mi-saison
+action	20000	promotion commerciale (en action = en promo)
+direct	15000	directement, sans détour
 cru	8000	humide et froid (temps cru)
 boquer	3000	bouder, refuser obstinément
 encoubler	3000	embarrasser, faire trébucher
 peser	8000	appuyer sur un bouton (pesez sur le bouton)
-imperdable	3000	épingle de sûreté, épingle de nourrice
+imperdable	3000	épingle de sûreté
 carrousel	5000	manège de chevaux de bois
 fion	3000	raillerie, moquerie
 gonfle	3000	congère de neige, embarras

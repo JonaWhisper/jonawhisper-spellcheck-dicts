@@ -1,42 +1,18 @@
 word	frequency	definition
-#
-# Belgicismes — Mots spécifiques au français de Belgique
-#
-# Sources:
-#   - Dictionnaire des belgicismes (Michel Francard, De Boeck, 2010)
-#   - Base de données lexicographiques panfrancophone (BDLP)
-#   - Académie royale de langue et de littérature françaises de Belgique
-#
-# Échelle de fréquence:
-#   50000 = très courant (usage quotidien généralisé)
-#   10000 = courant (connu de tous les locuteurs)
-#    5000 = régulier (usage fréquent dans certains contextes)
-#    3000 = connu (compris par la plupart des locuteurs)
-#
-# Les mots déjà présents dans le dictionnaire FR de base voient leur
-# fréquence boostée à cette valeur si elle est supérieure.
-
-# --- Nombres ---
-# Différence la plus emblématique entre français de Belgique et de France
 septante	50000	soixante-dix
 nonante	50000	quatre-vingt-dix
-
-# --- Repas (décalage systématique par rapport à la France) ---
-# En Belgique: déjeuner = matin, dîner = midi, souper = soir
 déjeuner	40000	petit-déjeuner
 dîner	40000	repas de midi
 souper	30000	repas du soir
-
-# --- Alimentation ---
 couque	8000	viennoiserie
-praline	15000	chocolat (bonbon de chocolat, pas la praline française)
+praline	15000	chocolat (bonbon en France)
 pralines	10000	chocolats
 spéculoos	12000	biscuit à la cassonade et aux épices
 babelute	3000	caramel dur traditionnel
 crotte	8000	truffe en chocolat
 pistolet	10000	petit pain rond croustillant
 pistolets	5000	petits pains ronds
-chicon	8000	endive (terme systématique en Belgique)
+chicon	8000	endive
 chicons	5000	endives
 caricole	3000	escargot de mer (bulot)
 stoemp	5000	purée de pommes de terre mélangée aux légumes
@@ -45,8 +21,6 @@ fricadelle	5000	boulette de viande frite allongée
 boulet	8000	boulette de viande à la liégeoise (sauce lapin)
 jatte	5000	bol, tasse
 rawette	3000	petite portion supplémentaire offerte par le commerçant
-
-# --- Ménage / maison ---
 drache	10000	forte pluie, averse violente
 dracher	5000	pleuvoir très fort
 essuie	10000	serviette (de bain ou de cuisine)
@@ -55,13 +29,11 @@ torchon	8000	serpillère (pour laver le sol)
 lavette	5000	carré de tissu humide pour nettoyer les surfaces
 loque	5000	serpillère, chiffon pour le sol
 loquer	3000	laver le sol à la serpillère
-wassingue	3000	serpillère (usage plutôt dans le nord/Hainaut)
+wassingue	3000	serpillère (usage dans le nord/Hainaut)
 ramassette	3000	pelle à poussière (avec balayette)
 balayette	5000	petit balai à main
 frigolite	5000	polystyrène expansé
 clenche	3000	poignée de porte (mécanisme à bascule)
-
-# --- Vie étudiante ---
 kot	15000	chambre d'étudiant (location)
 koter	5000	loger en kot
 koteur	3000	étudiant vivant en kot
@@ -72,10 +44,8 @@ blocus	8000	période intensive de révisions avant examens
 bloquer	8000	réviser intensivement (avant les examens)
 buser	5000	rater un examen, échouer
 bisser	5000	redoubler une année scolaire
-
-# --- Administration / politique ---
 bourgmestre	15000	maire (titre officiel en Belgique)
-échevin	10000	adjoint au bourgmestre, conseiller municipal délégué
+échevin	10000	adjoint au bourgmestre
 échevine	5000	adjointe au bourgmestre
 échevinal	3000	relatif à la fonction d'échevin
 échevinat	5000	charge ou bureau de l'échevin
@@ -84,36 +54,26 @@ communal	10000	relatif à la commune
 communale	8000	relative à la commune
 province	15000	subdivision administrative (10 provinces en Belgique)
 provincial	10000	relatif à la province
-
-# --- Transport ---
 aubette	5000	abribus, kiosque
 ring	10000	boulevard périphérique (autour d'une ville)
 navetteur	5000	personne faisant la navette domicile-travail
 navetteurs	5000	personnes faisant la navette
 navette	10000	trajet régulier domicile-travail
-
-# --- Vêtements / corps ---
-tirette	5000	fermeture éclair, fermeture à glissière
+tirette	5000	fermeture éclair
 brayette	3000	braguette
 slaches	3000	tongs, sandales ouvertes
 cloche	5000	ampoule cutanée (sur la peau)
-
-# --- Papeterie / école ---
 farde	8000	classeur, chemise cartonnée
 fardes	5000	classeurs
 bic	10000	stylo à bille (marque devenue nom commun)
 bics	5000	stylos à bille
 plumier	5000	trousse (pour ranger crayons et stylos)
 rhétorique	5000	dernière année du secondaire (terminale)
-
-# --- Argent / commerce ---
 dringuelle	3000	pourboire, gratification
 souche	5000	ticket de caisse, reçu
-
-# --- Divers ---
 sacoche	10000	sac à main
 tantôt	15000	cet après-midi, tout à l'heure
-carabistouille	3000	bêtise, sottise, histoire à dormir debout
+carabistouille	3000	bêtise, histoire à dormir debout
 carabistouilles	3000	bêtises
 cumulet	3000	galipette, culbute
 ducasse	5000	fête foraine, kermesse villageoise

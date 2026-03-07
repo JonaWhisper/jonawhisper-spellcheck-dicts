@@ -1,36 +1,16 @@
 word	frequency	definition
-#
-# Québécismes — Mots spécifiques au français du Québec
-#
-# Sources:
-#   - Usito, dictionnaire en ligne (Université de Sherbrooke)
-#   - Office québécois de la langue française (OQLF)
-#   - Base de données lexicographiques panfrancophone (BDLP)
-#
-# Échelle de fréquence:
-#   50000 = très courant (usage quotidien généralisé)
-#   10000 = courant (connu de tous les locuteurs)
-#    5000 = régulier (usage fréquent dans certains contextes)
-#    3000 = connu (compris par la plupart des locuteurs)
-#
-# Les mots déjà présents dans le dictionnaire FR de base voient leur
-# fréquence boostée à cette valeur si elle est supérieure.
-
-# --- Transport ---
-char	40000	voiture (terme générique au Québec)
+char	40000	voiture
 chars	20000	voitures
 bazou	5000	vieille voiture en mauvais état
 autobus	25000	bus (transport en commun)
-stationnement	20000	parking, aire de stationnement
+stationnement	20000	parking
 parcomètre	5000	parcmètre
-robeur	3000	pneu (anglicisme de « rubber »)
-
-# --- Commerce / vie quotidienne ---
-magasiner	20000	faire du shopping, faire les boutiques
-magasinage	15000	shopping, activité de magasiner
+robeur	3000	pneu (anglicisme de rubber)
+magasiner	20000	faire du shopping
+magasinage	15000	shopping
 dépanneur	15000	épicerie de quartier ouverte tard
 dépanneurs	8000	épiceries de quartier
-breuvage	10000	boisson (terme courant au Québec)
+breuvage	10000	boisson
 breuvages	5000	boissons
 liqueur	12000	boisson gazeuse (pas d'alcool)
 cégep	15000	collège d'enseignement général et professionnel
@@ -40,20 +20,16 @@ cégépienne	5000	étudiante de cégep
 polyvalente	10000	école secondaire publique
 tuque	10000	bonnet d'hiver tricoté
 tuques	5000	bonnets d'hiver
-mitaines	8000	moufles, gants sans doigts séparés
+mitaines	8000	moufles
 espadrilles	8000	chaussures de sport, baskets
-bobettes	5000	sous-vêtements (caleçons, culottes)
+bobettes	5000	sous-vêtements
 laveuse	8000	machine à laver le linge
 sécheuse	8000	sèche-linge
 champlure	3000	robinet (archaïsme français conservé)
-débarbouillette	5000	gant de toilette, petite serviette carrée
-
-# --- Personnes / relations ---
+débarbouillette	5000	gant de toilette
 blonde	25000	copine, petite amie
 chum	20000	copain, petit ami
-chums	10000	copains, amis proches
-
-# --- Météo / nature ---
+chums	10000	copains
 poudrerie	8000	neige soulevée et transportée par le vent
 sloche	5000	gadoue, neige fondante mêlée d'eau
 frette	10000	très froid (il fait frette)
@@ -62,10 +38,8 @@ caribou	10000	renne d'Amérique du Nord
 achigan	5000	perche noire (poisson d'eau douce)
 ouananiche	5000	saumon d'eau douce du lac Saint-Jean
 orignal	10000	élan d'Amérique
-maringouins	8000	moustiques (terme courant au Québec)
+maringouins	8000	moustiques
 maringouin	8000	moustique
-
-# --- Alimentation ---
 poutine	20000	frites garnies de fromage en grains et sauce brune
 poutines	8000	portions de poutine
 pogos	5000	saucisse enrobée de pâte de maïs frite
@@ -79,11 +53,9 @@ atoca	3000	canneberge (mot d'origine algonquienne)
 guédille	5000	sandwich garni dans un pain hot-dog
 croquignole	3000	beignet traditionnel frit
 tire	8000	tire d'érable (sirop bouilli versé sur la neige)
-pinottes	5000	cacahuètes, arachides
+pinottes	5000	cacahuètes
 pinotte	5000	cacahuète
-
-# --- Verbes / adjectifs courants ---
-achaler	8000	embêter, importuner quelqu'un
+achaler	8000	embêter, importuner
 achalant	5000	agaçant, importun
 achalandé	8000	très fréquenté (magasin, lieu public)
 achalandage	5000	affluence, nombre de visiteurs
@@ -95,35 +67,31 @@ niaiseux	5000	idiot, niais
 niaiseuse	5000	idiote, niaise
 niaiserie	5000	bêtise, sottise
 tannant	5000	agaçant, fatigant
-tanné	8000	fatigué, excédé, en avoir assez
+tanné	8000	fatigué, excédé
 barrer	8000	verrouiller (une porte, une voiture)
 débarrer	5000	déverrouiller
 embarquer	10000	monter dans un véhicule
 débarquer	8000	descendre d'un véhicule
 placoter	5000	bavarder, discuter longuement
 placotage	3000	bavardage, commérage
-maganer	5000	abîmer, endommager, malmener
-chialer	8000	râler, se plaindre, pleurnicher
+maganer	5000	abîmer, endommager
+chialer	8000	râler, se plaindre
 chialage	3000	plainte, jérémiade
-chialeux	3000	râleur, personne qui se plaint constamment
+chialeux	3000	râleur
 écœurant	8000	extraordinaire (positif) ou dégoûtant (négatif)
-abrier	3000	couvrir (avec une couverture, un manteau)
+abrier	3000	couvrir (avec une couverture)
 caler	5000	enfoncer dans la neige, perdre ses cheveux
 clairer	3000	congédier, mettre dehors
 enfirouaper	3000	embobiner, tromper par de belles paroles
-enfarger	3000	trébucher, s'empêtrer les pieds
-garrocher	5000	lancer quelque chose sans précaution
+enfarger	3000	trébucher, s'empêtrer
+garrocher	5000	lancer sans précaution
 pelleter	5000	déneiger à la pelle
 chauffer	8000	conduire un véhicule
-
-# --- Habitation ---
 duplex	8000	maison à deux logements superposés
 triplex	5000	maison à trois logements superposés
 perron	5000	escalier extérieur d'entrée
 galerie	10000	balcon couvert, véranda
-cabanon	5000	petit abri de jardin, remise
-
-# --- Administration / société ---
+cabanon	5000	petit abri de jardin
 arrondissement	15000	division administrative municipale
 garderie	10000	crèche, service de garde pour enfants
 préposé	8000	employé affecté à un poste spécifique
@@ -134,23 +102,19 @@ clavardage	8000	discussion en ligne en temps réel (chat)
 clavarder	5000	discuter en ligne (chatter)
 pourriel	5000	courrier électronique indésirable (spam)
 téléroman	5000	feuilleton télévisé québécois
-
-# --- Jurons (sacres, fréquents à l'oral, importants pour la dictée vocale) ---
 tabarnak	10000	juron québécois majeur (de tabernacle)
 câlice	8000	juron québécois (de calice)
 crisse	8000	juron québécois (de Christ)
 ostie	8000	juron québécois (de hostie)
 tabarnouche	3000	version atténuée de tabarnak
-
-# --- Divers ---
 vidanges	8000	ordures ménagères, poubelles
 foufounes	3000	fesses (familier)
 bécosses	3000	toilettes extérieures, latrines
 siffleux	3000	marmotte d'Amérique
-draveur	3000	flotteur de bois sur les rivières (métier historique)
+draveur	3000	flotteur de bois sur les rivières
 motoneige	8000	véhicule à chenilles pour la neige
 motoneiges	5000	véhicules à chenilles
-raquettes	8000	raquettes à neige pour marcher
+raquettes	8000	raquettes à neige
 érablière	5000	plantation d'érables à sucre
 acériculture	3000	culture de l'érable et production de sirop
 acériculteur	3000	producteur de sirop d'érable
