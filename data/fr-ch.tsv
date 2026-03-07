@@ -1,0 +1,113 @@
+# Swiss French regional words
+# Format: word<TAB>frequency<TAB>definition
+# Sources: Usito (Université de Sherbrooke), BDLP, Dictionnaire suisse romand (Thibault/Knecht, Zoé, 2004)
+#
+# Frequency scale: 50000 = very common, 10000 = common, 5000 = regular, 3000 = known
+# Words already in base FR dict get their frequency boosted to this value if higher.
+
+# Nombres
+septante	50000	soixante-dix
+huitante	50000	quatre-vingts (Vaud, Valais, Fribourg)
+nonante	50000	quatre-vingt-dix
+
+# Repas
+déjeuner	40000	petit-déjeuner
+dîner	40000	repas de midi
+souper	30000	repas du soir
+dix-heures	5000	collation du matin
+quatre-heures	5000	goûter
+
+# Technologie / quotidien
+natel	20000	téléphone portable
+natels	8000	téléphones portables
+bancomat	8000	distributeur de billets
+automate	10000	distributeur automatique
+
+# Alimentation
+bircher	10000	müesli
+rösti	12000	galette de pommes de terre
+fondue	20000	fondue au fromage
+raclette	15000	fromage fondu raclé
+cervelas	8000	saucisse nationale
+bricelet	3000	gaufrette croustillante
+damassine	3000	prune ou eau-de-vie
+herbettes	5000	fines herbes
+bénichon	5000	fête automnale fribourgeoise
+bouteille	15000	aussi: biberon
+
+# Ménage / maison
+panosse	8000	serpillère
+panosser	3000	passer la serpillère
+lavette	5000	carré de tissu
+fourre	5000	housse, étui
+fourres	3000	housses
+cornet	8000	sac plastique
+cornets	5000	sacs plastiques
+galetas	5000	grenier
+cheni	5000	désordre, poussière
+tablar	3000	étagère
+fourneau	8000	cuisinière
+potager	5000	cuisinière (synonyme)
+duvet	8000	couette
+
+# Transport
+pendulaire	8000	navetteur
+pendulaires	5000	navetteurs
+giratoire	8000	rond-point
+berme	3000	terre-plein d'autoroute
+
+# Administration / politique
+votation	15000	vote populaire
+votations	10000	votes populaires
+initiative	20000	initiative populaire
+canton	25000	division administrative
+cantons	15000	divisions administratives
+cantonal	10000	relatif au canton
+cantonaux	8000	relatifs aux cantons
+cantonale	8000	relative au canton
+cantonales	5000	relatives aux cantons
+cantonaliser	3000	transférer au niveau cantonal
+intercantonal	5000	entre cantons
+communal	10000	relatif à la commune
+communaux	5000	relatifs à la commune
+communale	8000	relative à la commune
+syndic	8000	maire (Vaud)
+municipal	10000	relatif à la municipalité
+municipale	8000	relative à la municipalité
+district	10000	subdivision cantonale
+préfet	8000	chef de district
+assermentation	3000	prestation de serment
+
+# Éducation
+maturité	12000	baccalauréat
+gymnase	10000	lycée
+gymnasien	5000	lycéen
+gymnasienne	5000	lycéenne
+gymnasial	3000	relatif au gymnase
+apprenti	10000	en formation professionnelle
+apprentie	8000	en formation professionnelle
+apprentissage	15000	formation professionnelle
+logopédiste	3000	orthophoniste
+doubler	5000	redoubler une année
+
+# Nature / géographie
+armailli	3000	vacher d'alpage
+inalpe	3000	montée des troupeaux en alpage
+désalpe	5000	descente des troupeaux
+bisse	5000	canal d'irrigation (Valais)
+gouille	3000	flaque d'eau
+châble	3000	pente boisée
+foyard	3000	hêtre
+mayens	3000	pâturages de mi-saison
+
+# Expressions / divers
+action	20000	promotion commerciale
+direct	15000	directement
+cru	8000	humide et froid (temps)
+boquer	3000	bouder
+encoubler	3000	embarrasser, trébucher
+peser	8000	appuyer (sur un bouton)
+imperdable	3000	épingle de sûreté
+carrousel	5000	manège
+fion	3000	raillerie
+gonfle	3000	congère, embarras

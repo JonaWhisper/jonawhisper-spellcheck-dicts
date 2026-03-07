@@ -1,0 +1,108 @@
+# Belgian French regional words
+# Format: word<TAB>frequency<TAB>definition
+# Sources: Dictionnaire des belgicismes (Francard, 2010), BDLP, Académie royale de Belgique
+#
+# Frequency scale: 50000 = very common, 10000 = common, 5000 = regular, 3000 = known
+# Words already in base FR dict get their frequency boosted to this value if higher.
+
+# Nombres
+septante	50000	soixante-dix
+nonante	50000	quatre-vingt-dix
+
+# Repas (décalage systématique FR-BE)
+déjeuner	40000	petit-déjeuner
+dîner	40000	repas de midi
+souper	30000	repas du soir
+
+# Alimentation
+couque	8000	viennoiserie
+praline	15000	chocolat (bonbon en France)
+pralines	10000	chocolats
+spéculoos	12000	biscuit à la cassonade
+babelute	3000	caramel
+crotte	8000	truffe en chocolat
+pistolet	10000	petit pain rond
+pistolets	5000	petits pains ronds
+chicon	8000	endive
+chicons	5000	endives
+caricole	3000	escargot de mer
+stoemp	5000	purée avec légumes
+waterzooi	5000	ragoût gantois
+fricadelle	5000	boulette frite
+boulet	8000	boulette de viande liégeoise
+jatte	5000	bol, tasse
+rawette	3000	petite portion en plus
+
+# Ménage / maison
+drache	10000	forte pluie
+dracher	5000	pleuvoir fort
+essuie	10000	serviette
+essuies	5000	serviettes
+torchon	8000	serpillère
+lavette	5000	carré de tissu humide
+loque	5000	serpillère
+loquer	3000	laver le sol
+wassingue	3000	serpillère (nord)
+ramassette	3000	pelle à poussière
+balayette	5000	petit balai
+frigolite	5000	polystyrène
+clenche	3000	poignée de porte
+
+# Vie étudiante
+kot	15000	chambre d'étudiant
+koter	5000	loger en kot
+koteur	3000	étudiant en kot
+koteuse	3000	étudiante en kot
+guindaille	5000	fête étudiante
+guindailler	3000	faire la fête
+blocus	8000	période de révisions
+bloquer	8000	réviser intensivement
+buser	5000	rater un examen
+bisser	5000	redoubler
+
+# Administration / politique
+bourgmestre	15000	maire
+échevin	10000	adjoint au maire
+échevine	5000	adjointe au maire
+échevinal	3000	relatif à l'échevin
+échevinat	5000	fonction d'échevin
+athénée	10000	lycée
+communal	10000	relatif à la commune
+communale	8000	relative à la commune
+province	15000	subdivision administrative
+provincial	10000	relatif à la province
+
+# Transport
+aubette	5000	abribus
+ring	10000	périphérique
+navetteur	5000	pendulaire
+navetteurs	5000	pendulaires
+navette	10000	trajet domicile-travail
+
+# Vêtements / corps
+tirette	5000	fermeture éclair
+brayette	3000	braguette
+slaches	3000	tongs
+cloche	5000	ampoule (peau)
+
+# Papeterie / école
+farde	8000	classeur
+fardes	5000	classeurs
+bic	10000	stylo à bille
+bics	5000	stylos à bille
+plumier	5000	trousse
+rhétorique	5000	terminale
+
+# Argent / commerce
+dringuelle	3000	pourboire
+souche	5000	ticket de caisse
+
+# Divers
+sacoche	10000	sac à main
+tantôt	15000	cet après-midi
+carabistouille	3000	bêtise
+carabistouilles	3000	bêtises
+cumulet	3000	galipette
+ducasse	5000	fête foraine
+kermesse	8000	fête populaire
+craboutchas	3000	gribouillage

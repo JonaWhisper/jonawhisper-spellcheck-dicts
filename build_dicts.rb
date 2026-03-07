@@ -34,7 +34,34 @@ module DictBuilder
     f.options.open_timeout = 15
   end
 
+  DATA_DIR = File.join(File.dirname(File.realpath(__FILE__)), "data")
+
   module_function
+
+  # Merge regional words from data/<code>.tsv into a base word hash.
+  # TSV format: word<TAB>frequency<TAB>definition (comments start with #).
+  # Returns the number of words added/boosted.
+  def merge_regional!(words, code)
+    path = File.join(DATA_DIR, "#{code}.tsv")
+    unless File.exist?(path)
+      warn "  WARNING: #{path} not found, skipping regional words"
+      return 0
+    end
+
+    count = 0
+    File.foreach(path, encoding: "utf-8") do |line|
+      line = line.strip
+      next if line.empty? || line.start_with?("#")
+      parts = line.split("\t")
+      next if parts.size < 2
+      word = parts[0].strip.downcase
+      freq = Integer(parts[1].strip, exception: false) || 0
+      next if word.empty? || freq <= 0
+      words[word] = [words.fetch(word, 0), freq].max
+      count += 1
+    end
+    count
+  end
 
   def download(url, dest, http: HTTP)
     if File.exist?(dest)
