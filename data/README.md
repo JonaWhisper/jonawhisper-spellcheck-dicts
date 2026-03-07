@@ -46,3 +46,7 @@ To add a new regional variant: create a new `<lang-code>.tsv` file (e.g. `fr-af.
 - Usito, dictionnaire en ligne (Université de Sherbrooke) — index des helvétismes
 - Dictionnaire suisse romand (André Thibault & Pierre Knecht, Éditions Zoé, 2004)
 - Base de données lexicographiques panfrancophone (BDLP)
+
+### en-gb (British English)
+- Oxford English Dictionary — systematic spelling patterns (-our/-or, -ise/-ize, -re/-er, -ence/-ense, etc.)
+- Cambridge Dictionary — British vs American usage

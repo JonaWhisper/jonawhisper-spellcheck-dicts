@@ -9,19 +9,25 @@ module Langs
 
     module_function
 
-    def build_freq(http:, tmp_dir:)
+    def base_words(http:, tmp_dir:)
       puts "Building EN frequency dictionary..."
       src = DictBuilder.download(SOURCES[:freq], File.join(tmp_dir, "en_freq.txt"), http: http)
 
-      words = []
+      words = {}
       File.foreach(src, encoding: "utf-8") do |line|
         parts = line.strip.split(" ", 2)
         next unless parts.size == 2
-        words << [parts[0], Integer(parts[1], exception: false) || 0]
+        word = parts[0]
+        freq = Integer(parts[1], exception: false) || 0
+        words[word] = freq if !words.key?(word) || words[word] < freq
       end
 
       puts "  #{words.size} words"
       words
+    end
+
+    def build_freq(http:, tmp_dir:)
+      base_words(http: http, tmp_dir: tmp_dir).sort_by { |_, freq| -freq }
     end
 
     def build_bigrams(http:, tmp_dir:)
