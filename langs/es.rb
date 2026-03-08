@@ -22,7 +22,7 @@ module Langs
 
     def label = "Espa\u00f1ol"
 
-    def build_freq(http:, tmp_dir:)
+    def base_words(http:, tmp_dir:)
       puts "Building ES frequency dictionary..."
       src = DictBuilder.download(SOURCES[:freq], File.join(tmp_dir, "es_freq.txt"), http: http)
 
@@ -36,7 +36,11 @@ module Langs
       end
 
       puts "  #{words.size} words"
-      words.sort_by { |_, freq| -freq }
+      words
+    end
+
+    def build_freq(http:, tmp_dir:)
+      base_words(http: http, tmp_dir: tmp_dir).sort_by { |_, freq| -freq }
     end
 
     def build_bigrams(http:, tmp_dir:)
