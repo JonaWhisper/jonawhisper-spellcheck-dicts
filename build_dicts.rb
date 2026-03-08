@@ -252,12 +252,62 @@ end
 # --- Main ---
 
 if __FILE__ == $PROGRAM_NAME
-  cache_dir = ENV["DICT_CACHE_DIR"]
+  require "optparse"
 
-  if cache_dir
-    FileUtils.mkdir_p(cache_dir)
-    run(cache_dir)
-  else
-    Dir.mktmpdir("jonawhisper-spellcheck") { |tmp_dir| run(tmp_dir) }
+  options = {}
+  OptionParser.new do |opts|
+    opts.banner = "Usage: ruby build_dicts.rb [options]"
+    opts.on("--lang CODE", "Build only this language (e.g. 'fr', 'pt-br')") { |v| options[:lang] = v }
+    opts.on("--manifest-only", "Build manifest from existing output/ files") { options[:manifest_only] = true }
+    opts.on("--list", "List available languages as JSON array") { options[:list] = true }
+  end.parse!
+
+  if options[:list]
+    puts JSON.generate(available_langs.map(&:first))
+    exit
   end
+
+  cache_dir = ENV["DICT_CACHE_DIR"]
+  tmp_dir_proc = ->(block) {
+    if cache_dir
+      FileUtils.mkdir_p(cache_dir)
+      block.call(cache_dir)
+    else
+      Dir.mktmpdir("jonawhisper-spellcheck") { |d| block.call(d) }
+    end
+  }
+
+  if options[:manifest_only]
+    # Rebuild manifest from existing output/ files
+    langs = available_langs
+    lang_modules = langs.to_h
+    all_files = {}
+    langs.each do |code, _mod|
+      freq_path = File.join(OUTPUT_DIR, "#{code}-freq.txt")
+      bigram_path = File.join(OUTPUT_DIR, "#{code}-bigram.txt")
+      next unless File.exist?(freq_path) && File.exist?(bigram_path)
+      all_files[code] = {
+        "freq.txt" => { path: freq_path, entries: File.readlines(freq_path).size },
+        "bigram.txt" => { path: bigram_path, entries: File.readlines(bigram_path).size },
+      }
+    end
+    build_manifest(all_files, lang_modules)
+    exit
+  end
+
+  tmp_dir_proc.call(->(tmp_dir) {
+    if options[:lang]
+      code = options[:lang]
+      langs = available_langs.select { |c, _| c == code }
+      if langs.empty?
+        warn "ERROR: language '#{code}' not found in langs/"
+        exit 1
+      end
+      FileUtils.mkdir_p(OUTPUT_DIR)
+      _code, lang_mod = langs.first
+      build_lang(code, lang_mod, tmp_dir: tmp_dir)
+    else
+      run(tmp_dir)
+    end
+  })
 end

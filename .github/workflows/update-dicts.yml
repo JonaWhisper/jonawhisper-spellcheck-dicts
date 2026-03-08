@@ -2,6 +2,11 @@ name: Update dictionaries
 
 on:
   workflow_dispatch:
+    inputs:
+      language:
+        description: "Language code (e.g. 'fr', 'pt-br'). Leave empty for all."
+        required: false
+        default: ""
   schedule:
     # First Monday of each month at 06:00 UTC
     - cron: '0 6 1-7 * 1'
@@ -10,26 +15,79 @@ permissions:
   contents: write
 
 jobs:
-  update:
+  matrix:
+    name: Build language list
     runs-on: ubuntu-latest
+    outputs:
+      langs: ${{ steps.list.outputs.langs }}
     steps:
       - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Resolve languages
+        id: list
+        run: |
+          if [ -n "${{ inputs.language }}" ]; then
+            echo "langs=[\"${{ inputs.language }}\"]" >> "$GITHUB_OUTPUT"
+          else
+            echo "langs=$(bundle exec ruby build_dicts.rb --list)" >> "$GITHUB_OUTPUT"
+          fi
 
+  build:
+    needs: matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lang: ${{ fromJson(needs.matrix.outputs.langs) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: Build dictionaries
-        run: bundle exec ruby build_dicts.rb
+      - name: "Build ${{ matrix.lang }}"
+        run: bundle exec ruby build_dicts.rb --lang "${{ matrix.lang }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dict-${{ matrix.lang }}
+          path: output/
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: output/
+          pattern: dict-*
+          merge-multiple: true
+
+      - name: Build manifest
+        run: bundle exec ruby build_dicts.rb --manifest-only
+
+      - name: List output
+        run: ls -lh output/
 
       - name: Check if release needed
         id: check
         run: |
-          # Download current manifest from latest release (if any)
           if gh release download latest -p manifest.json -D /tmp/current 2>/dev/null; then
-            old_sha=$(cat /tmp/current/manifest.json | sha256sum | cut -d' ' -f1)
-            new_sha=$(cat output/manifest.json | sha256sum | cut -d' ' -f1)
+            old_sha=$(sha256sum /tmp/current/manifest.json | cut -d' ' -f1)
+            new_sha=$(sha256sum output/manifest.json | cut -d' ' -f1)
             if [ "$old_sha" = "$new_sha" ]; then
               echo "changed=false" >> "$GITHUB_OUTPUT"
               echo "No changes detected."
@@ -48,12 +106,10 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         id: version
         run: |
-          # Get latest tag, bump patch
           latest=$(gh release list --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null || echo "")
           if [ -z "$latest" ] || [ "$latest" = "null" ]; then
             echo "tag=v1.0.0" >> "$GITHUB_OUTPUT"
           else
-            # Strip 'v' prefix, split, bump patch
             ver="${latest#v}"
             IFS='.' read -r major minor patch <<< "$ver"
             patch=$((patch + 1))
