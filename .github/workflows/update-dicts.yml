@@ -21,7 +21,7 @@ jobs:
     outputs:
       langs: ${{ steps.list.outputs.langs }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
@@ -43,7 +43,7 @@ jobs:
         lang: ${{ fromJson(needs.matrix.outputs.langs) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
@@ -53,7 +53,7 @@ jobs:
         run: bundle exec ruby build_dicts.rb --lang "${{ matrix.lang }}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dict-${{ matrix.lang }}
           path: output/
@@ -63,14 +63,14 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
           bundler-cache: true
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: output/
           pattern: dict-*
