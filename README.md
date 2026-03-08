@@ -14,8 +14,21 @@ Published as **GitHub Release assets** — the repo contains only the build tool
 | `fr-ch` | Français (Suisse) | Lexique383 + DELA | ~90 helvétismes |
 | `en` | English | SymSpell corpus | — |
 | `en-gb` | English (British) | SymSpell corpus | ~230 British spellings |
+| `de` | Deutsch | SymSpell 100k | — |
+| `de-at` | Deutsch (Österreich) | SymSpell 100k | ~50 Austrian words |
+| `de-ch` | Deutsch (Schweiz) | SymSpell 100k | ~50 Swiss words |
+| `es` | Español | SymSpell 100k | — |
+| `es-mx` | Español (México) | SymSpell 100k | ~55 Mexican words |
+| `pt` | Português | FrequencyWords 50k | — |
+| `pt-br` | Português (Brasil) | FrequencyWords 50k | ~55 Brazilian words |
+| `pt-pt` | Português (Portugal) | FrequencyWords 50k | ~50 European PT words |
+| `it` | Italiano | SymSpell 100k | — |
+| `nl` | Nederlands | FrequencyWords 50k | — |
+| `nl-be` | Nederlands (België) | FrequencyWords 50k | ~55 Flemish words |
+| `pl` | Polski | FrequencyWords 50k | — |
+| `ru` | Русский | SymSpell 100k | — |
 
-Regional dictionaries inherit all words from their base language and boost regional vocabulary so that SymSpell doesn't "correct" local words into another variant (e.g. _colour_ → _color_, _septante_ → _soixante-dix_).
+Regional dictionaries inherit all words from their base language and boost regional vocabulary so that SymSpell doesn't "correct" local words into another variant (e.g. _colour_ → _color_, _septante_ → _soixante-dix_, _ônibus_ → _autocarro_).
 
 ## Download
 
@@ -31,7 +44,7 @@ https://github.com/JonaWhisper/jonawhisper-spellcheck-dicts/releases/latest/down
 
 - `<code>-freq.txt`: one word per line, `word<separator>frequency`
   - FR variants: tab-separated
-  - EN variants: space-separated
+  - All others: space-separated
 - `<code>-bigram.txt`: `word1 word2 frequency` (space-separated)
 - `manifest.json`: SHA256 checksums, sizes, and entry counts per file
 
@@ -77,7 +90,9 @@ It rebuilds all dictionaries, compares the manifest with the latest release, and
 - **Lexique383** (Boris New & Christophe Pallier) — CC BY-SA 4.0
 - **DELA** (LADL, Paris 7) — public domain linguistic resource
 - **Google Books Ngram Corpus v3** — CC BY 3.0
-- **SymSpell EN dictionaries** (Wolf Garbe) — MIT License
+- **SymSpell dictionaries** (Wolf Garbe) — MIT License — DE, ES, IT, RU
+- **FrequencyWords** (hermitdave, OpenSubtitles 2018) — MIT License — PT, NL, PL
+- **Leipzig Corpora Collection** (Universität Leipzig) — CC BY 4.0 — bigrams for all languages
 
 ### Regional word lists
 - **Usito** (Université de Sherbrooke) — québécismes and helvétismes indexes
@@ -85,5 +100,4 @@ It rebuilds all dictionaries, compares the manifest with the latest release, and
 - **BDLP** (Base de données lexicographiques panfrancophone)
 - **Dictionnaire des belgicismes** (Michel Francard, De Boeck, 2010)
 - **Dictionnaire suisse romand** (André Thibault & Pierre Knecht, Éditions Zoé, 2004)
-- **Académie royale de langue et de littérature françaises de Belgique**
 - **Oxford English Dictionary** — British vs American spelling patterns
