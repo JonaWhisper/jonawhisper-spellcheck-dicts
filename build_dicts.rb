@@ -77,6 +77,69 @@ module DictBuilder
     puts "  saved: #{(File.size(dest) / 1024.0).round(1)} KB"
     dest
   end
+
+  # Build bigrams from Leipzig Corpora tar.gz archives.
+  # Shared by all languages that use Leipzig as bigram source.
+  # Returns array of [word1, word2, freq] triples.
+  def build_leipzig_bigrams(corpora_urls, limit:, word_re:, http:, tmp_dir:)
+    require "rubygems/package"
+
+    bigrams = {}
+
+    corpora_urls.each do |url|
+      filename = File.basename(url)
+      corpus_name = filename.sub(/\.tar\.gz$/, "")
+      dest = File.join(tmp_dir, filename)
+
+      begin
+        download(url, dest, http: http)
+      rescue => e
+        warn "  WARNING: failed to download #{filename}: #{e.message}"
+        next
+      end
+
+      count = 0
+      sentences_entry = "#{corpus_name}/#{corpus_name}-sentences.txt"
+
+      File.open(dest, "rb") do |file|
+        Zlib::GzipReader.wrap(file) do |gz|
+          Gem::Package::TarReader.new(gz) do |tar|
+            tar.each do |entry|
+              next unless entry.full_name == sentences_entry
+
+              entry.read.force_encoding("utf-8").each_line do |line|
+                parts = line.strip.split("\t", 2)
+                next unless parts.size == 2
+
+                words = parts[1].split
+                words.each_cons(2) do |w1, w2|
+                  w1 = w1.downcase
+                  w2 = w2.downcase
+                  next unless word_re.match?(w1) && word_re.match?(w2)
+                  next if w1.length <= 1 && w2.length <= 1
+
+                  key = [w1, w2].freeze
+                  bigrams[key] = (bigrams[key] || 0) + 1
+                  count += 1
+                end
+              end
+
+              break
+            end
+          end
+        end
+      end
+
+      puts "  #{corpus_name}: +#{count} bigram occurrences (unique so far: #{bigrams.size})"
+    end
+
+    puts "  Total unique bigrams: #{bigrams.size}"
+
+    result = bigrams.sort_by { |_, freq| -freq }.first(limit)
+    puts "  Kept top #{result.size} bigrams"
+
+    result.map { |(w1, w2), freq| [w1, w2, freq] }
+  end
 end
 
 # --- Discover and load language modules ---

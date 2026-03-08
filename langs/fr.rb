@@ -73,72 +73,11 @@ module Langs
 
     def build_bigrams(http:, tmp_dir:)
       puts "Building FR bigrams from Leipzig Corpora (target: #{BIGRAM_LIMIT})..."
-
-      bigrams = {}
-
-      SOURCES[:bigram_corpora].each do |url|
-        filename = File.basename(url)
-        corpus_name = filename.sub(/\.tar\.gz$/, "")
-        dest = File.join(tmp_dir, filename)
-
-        begin
-          DictBuilder.download(url, dest, http: http)
-        rescue => e
-          warn "  WARNING: failed to download #{filename}: #{e.message}"
-          next
-        end
-
-        count = extract_bigrams_from_tar(dest, corpus_name, bigrams)
-        puts "  #{corpus_name}: +#{count} bigram occurrences (unique so far: #{bigrams.size})"
-      end
-
-      puts "  Total unique bigrams: #{bigrams.size}"
-
-      # Sort by frequency descending, take top N
-      result = bigrams.sort_by { |_, freq| -freq }.first(BIGRAM_LIMIT)
-      puts "  Kept top #{result.size} bigrams"
-
-      result.map { |(w1, w2), freq| [w1, w2, freq] }
-    end
-
-    # Extract adjacent-word bigrams from sentences in a Leipzig tar.gz corpus.
-    # Leipzig sentence format: "id\tsentence text\n"
-    def extract_bigrams_from_tar(tar_path, corpus_name, bigrams)
-      require "rubygems/package"
-
-      count = 0
-      sentences_entry = "#{corpus_name}/#{corpus_name}-sentences.txt"
-
-      File.open(tar_path, "rb") do |file|
-        Zlib::GzipReader.wrap(file) do |gz|
-          Gem::Package::TarReader.new(gz) do |tar|
-            tar.each do |entry|
-              next unless entry.full_name == sentences_entry
-
-              entry.read.force_encoding("utf-8").each_line do |line|
-                parts = line.strip.split("\t", 2)
-                next unless parts.size == 2
-
-                words = parts[1].split
-                words.each_cons(2) do |w1, w2|
-                  w1 = w1.downcase
-                  w2 = w2.downcase
-                  next unless ALPHA_WORD_RE.match?(w1) && ALPHA_WORD_RE.match?(w2)
-                  next if w1.length <= 1 && w2.length <= 1  # skip single-char pairs
-
-                  key = [w1, w2].freeze
-                  bigrams[key] = (bigrams[key] || 0) + 1
-                  count += 1
-                end
-              end
-
-              break  # found sentences.txt, no need to continue
-            end
-          end
-        end
-      end
-
-      count
+      DictBuilder.build_leipzig_bigrams(
+        SOURCES[:bigram_corpora],
+        limit: BIGRAM_LIMIT, word_re: ALPHA_WORD_RE,
+        http: http, tmp_dir: tmp_dir,
+      )
     end
 
     def freq_separator
