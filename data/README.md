@@ -50,3 +50,27 @@ To add a new regional variant: create a new `<lang-code>.tsv` file (e.g. `fr-af.
 ### en-gb (British English)
 - Oxford English Dictionary — systematic spelling patterns (-our/-or, -ise/-ize, -re/-er, -ence/-ense, etc.)
 - Cambridge Dictionary — British vs American usage
+
+### de-at (Austrian German)
+- Österreichisches Wörterbuch (official Austrian dictionary)
+- Austrian culinary and administrative terminology
+
+### de-ch (Swiss German)
+- Duden — Schweizerhochdeutsch entries
+- Swiss administrative and daily vocabulary (written standard, not dialect)
+
+### es-mx (Mexican Spanish)
+- Diccionario de mexicanismos (Academia Mexicana de la Lengua)
+- Common LATAM vs Peninsular Spanish differences
+
+### pt-br (Brazilian Portuguese)
+- Dicionário Houaiss — Brazilian usage markers
+- Common BR vs PT vocabulary differences (post-1990 orthographic agreement)
+
+### pt-pt (European Portuguese)
+- Dicionário Priberam — European Portuguese entries
+- Common PT vs BR vocabulary differences
+
+### nl-be (Belgian Dutch / Flemish)
+- Van Dale — Belgian Dutch entries
+- Flemish administrative and daily vocabulary
