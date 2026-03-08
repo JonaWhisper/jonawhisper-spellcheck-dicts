@@ -45,8 +45,7 @@ docs: update README with new language
    - `build_freq(http:, tmp_dir:)` — Returns sorted `[[word, freq], ...]`
    - `build_bigrams(http:, tmp_dir:)` — Returns `[[w1, w2, freq], ...]`
    - `freq_separator` — Column separator (tab or space)
-2. Add the language to `build_dicts.rb`
-3. Test: `ruby build_dicts.rb`
+2. Test: `bundle exec ruby build_dicts.rb` (languages are auto-discovered from `langs/`)
 
 ## Adding a Regional Variant
 
